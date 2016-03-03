@@ -1,6 +1,7 @@
 #include "CGFEngine.h"
 #include "CGFGame.h"
 #include "CGFActor.h"
+#include "Ball.h"
 
 using namespace CGF;
 
@@ -10,7 +11,9 @@ struct TestActorImage : public CGFImage
 	{
 		ImageArray = 
 		{
-			{ 'G', 'X', 'B'}
+			{ 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'X', 'X', 'X', 'X', 'X', 'O', 'O' },
+			{ 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'O', 'O', 'O', 'O', 'X', 'X', 'X' },
+			{ 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X' }
 		};
 	}
 };
@@ -23,19 +26,21 @@ public:
 	{
 		SetImage(TestActorImage());
 
-		SetPosition(CGFVector(19, 3));
-		SetOrigin(CGFVector(1, 0));
+		SetPosition(CGFVector(0, 3));
+		SetOrigin(CGFVector(0, 0));
 
-		AddColorForKey('G', (COLORREF)CGFColors::Green);
-		AddColorForKey('X', (COLORREF)CGFColors::Red);
-		AddColorForKey('B', (COLORREF)CGFColors::Blue);
+		SetColorForKey('X', (COLORREF)CGFColors::Blue);
+
+		SetCollisionForKey('X', true);
+
+		CreateCollisionShape(PhysicsType::StaticBody);
 	}
 
 	virtual void Update(float delta)
 	{
-		float Rotation = GetRotation();
+		/*float Rotation = GetRotation();
 		Rotation += delta * 180;
-		SetRotation(Rotation);
+		SetRotation(Rotation);*/
 	}
 };
 
@@ -43,11 +48,13 @@ class Game : public CGFGame
 {
 public:
 
-	TestActor* pActor;
+	Ball* pActor;
+	TestActor* pTest;
 
 	Game()
 	{
-		pActor = new TestActor();
+		pActor = new Ball();
+		pTest = new TestActor();
 	}
 
 	~Game()
@@ -55,6 +62,11 @@ public:
 		if (pActor)
 		{
 			delete pActor;
+		}
+
+		if (pTest)
+		{
+			delete pTest;
 		}
 	}
 
@@ -70,6 +82,8 @@ public:
 int main()
 {
 	CGFEngine* Engine = CGFEngine::Instance();
+	Engine->CreatePhysicsWorld(CGFVector(0, 1));
+
 	Game* pGame = new Game;
 	if (Engine && pGame)
 	{

@@ -10,6 +10,7 @@
 #include <windows.h>
 #include <tchar.h>
 #include <math.h>
+#include "Box2d/Box2D.h"
 
 #pragma warning( disable: 4251 )
 
@@ -34,6 +35,7 @@ namespace CGF
 		CGFVector(int x, int y) : X((float)x), Y((float)y) {}
 		CGFVector(float x, float y) : X(x), Y(y) {}
 		CGFVector() : X(0), Y(0) {}
+		CGFVector(b2Vec2 vec) : X(vec.x), Y(vec.y) {}
 
 		// static CGFVector ZeroVector(0, 0);
 		CGFVector& operator+= (CGFVector Vector)
@@ -117,6 +119,11 @@ namespace CGF
 		float Angle(CGFVector Vector)
 		{
 			return acos(Dot(Vector) / this->Length() * Vector.Length());
+		}
+
+		b2Vec2 ToB2Vec()
+		{
+			return b2Vec2(X, Y);
 		}
 
 		float X;
@@ -264,6 +271,124 @@ namespace CGF
 		Gainsboro = RGB(220, 220, 220),
 		WhiteSmoke = RGB(245, 245, 245),
 		White = RGB(255, 255, 255)
+	};
+
+	enum class CGFKeys
+	{
+		KEY_ESC,
+		KEY_F1,
+		KEY_F2,
+		KEY_F3,
+		KEY_F4,
+		KEY_F5,
+		KEY_F6,
+		KEY_F7,
+		KEY_F8,
+		KEY_F9,
+		KEY_F10,
+		KEY_F11,
+		KEY_F12,
+		KEY_PRNTSCR,
+		KEY_SCRLCK,
+		KEY_BREAK,
+
+		KEY_M1,
+		KEY_TIDE,
+		KEY_1,
+		KEY_2,
+		KEY_3,
+		KEY_4,
+		KEY_5,
+		KEY_6,
+		KEY_7,
+		KEY_8,
+		KEY_9,
+		KEY_0,
+		KEY_HYPHEN,
+		KEY_EQUAL,
+		KEY_BACKSPACE,
+		KEY_INS,
+		KEY_HOME,
+		KEY_PAGEUP,
+		KEY_NUMLCK,
+		KEY_DIVIDE,
+		KEY_MULTIPLY,
+		KEY_MINUS,
+		
+		KEY_M2,
+		KEY_TAB,
+		KEY_Q,
+		KEY_W,
+		KEY_E,
+		KEY_R,
+		KEY_T,
+		KEY_Y,
+		KEY_U,
+		KEY_I,
+		KEY_O,
+		KEY_P,
+		KEY_OPENBRACE,
+		KEY_CLOSEBRACE,
+		KEY_,
+		KEY_DEL,
+		KEY_END,
+		KEY_PAGEDOWN,
+		KEY_NUM7,
+		KEY_NUM8,
+		KEY_NUM9,
+		KEY_PLUS,
+
+		KEY_M3,
+		KEY_CAPS,
+		KEY_A,
+		KEY_S,
+		KEY_D,
+		KEY_F,
+		KEY_G,
+		KEY_H,
+		KEY_J,
+		KEY_K,
+		KEY_L,
+		KEY_SEMICOLON,
+		KEY_APOSTROPHE,
+		KEY_ENTER,
+		KEY_NUM4,
+		KEY_NUM5,
+		KEY_NUM6,
+
+		KEY_M4,
+		KEY_LSHIFT,
+		KEY_Z,
+		KEY_X,
+		KEY_C,
+		KEY_V,
+		KEY_B,
+		KEY_N,
+		KEY_M,
+		KEY_COMMA,
+		KEY_DOT,
+		KEY_QUESTIONMARK,
+		KEY_RSHIFT,
+		KEY_UP,
+		KEY_NUM1,
+		KEY_NUM2,
+		KEY_NUM3,
+		
+		KEY_M5,
+		KEY_LCTRL,
+		KEY_WINKEY,
+		KEY_LALT,
+		KEY_SPACE,
+		KEY_RALT,
+		KEY_FN,
+		KEY_OPTION,
+		KEY_RCTRL,
+		KEY_LEFT,
+		KEY_DOWN,
+		KEY_RIGHT,
+		KEY_NUM0,
+		KEY_NUMDEL,
+		KEY_NUMENTER
 	};
 
 	template <typename T>

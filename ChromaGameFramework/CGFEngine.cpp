@@ -11,6 +11,7 @@ namespace CGF
 
 	CGFEngine::CGFEngine()
 		: m_bExit(false)
+		, PhysicsWorld(nullptr)
 	{
 		m_ChromaSDKModule = LoadLibrary(CHROMASDKDLL);
 
@@ -19,11 +20,17 @@ namespace CGF
 
 		CreateKeyboardEffect = (CREATEKEYBOARDEFFECT)GetProcAddress(m_ChromaSDKModule, "CreateKeyboardEffect");
 		SetEffect = (SETEFFECT)GetProcAddress(m_ChromaSDKModule, "SetEffect");
+
 	}
 
 
 	CGFEngine::~CGFEngine()
 	{
+		if (PhysicsWorld)
+		{
+			delete PhysicsWorld;
+			PhysicsWorld = nullptr;
+		}
 	}
 
 	CGFEngine* CGFEngine::Instance()
@@ -44,6 +51,16 @@ namespace CGF
 			delete _pInstance;
 			_pInstance = nullptr;
 		}
+	}
+
+	void CGFEngine::CreatePhysicsWorld(CGFVector Gravity)
+	{
+		PhysicsWorld = new b2World(b2Vec2(Gravity.X, Gravity.Y));
+	}
+
+	b2World* CGFEngine::GetPhysicsWorld()
+	{
+		return PhysicsWorld;
 	}
 
 	void CGFEngine::SetGameClass(class CGFGame* pGame)
@@ -97,6 +114,25 @@ namespace CGF
 			if (pActor)
 			{
 				pActor->Update(Delta);
+			}
+		}
+
+		if (PhysicsWorld)
+		{
+			float32 timeStep = Delta;
+			static const int32 velocityIterations = 8;
+			static const int32 positionIterations = 4;
+
+			PhysicsWorld->Step(timeStep, velocityIterations, positionIterations);
+
+			actorIt = m_actorList.begin();
+			for (actorIt; actorIt != m_actorList.end(); actorIt++)
+			{
+				CGFActor* pActor = *actorIt;
+				if (pActor)
+				{
+					pActor->PhysicsUpdate();
+				}
 			}
 		}
 	}

@@ -2,12 +2,13 @@
 
 namespace CGF
 {
-
 	CGFActor::CGFActor()
 		: bIsVisible(true)
 		, Color((COLORREF)CGFColors::White)
 		, m_rotation(0)
 		, m_pParent(nullptr)
+		, BodyShape(nullptr)
+		, PhysicsBody(nullptr)
 	{
 		CGFEngine::Instance()->AddActor(this);
 	}
@@ -28,6 +29,51 @@ namespace CGF
 
 	}
 
+	void CGFActor::SetPosition(CGFVector& Position)
+	{
+		m_position = Position; 
+
+		if (GetPhysicsBody())
+		{
+			GetPhysicsBody()->SetTransform(m_position.ToB2Vec(), m_rotation * Deg2Rad);
+		}
+	}
+
+	CGFVector& CGFActor::GetPosition()
+	{ 
+		return m_position; 
+	}
+
+	void CGFActor::SetOrigin(CGFVector& Origin)
+	{ 
+		m_origin = Origin; 
+
+		if (GetPhysicsBody())
+		{
+			GetPhysicsBody()->SetTransform(m_position.ToB2Vec(), m_rotation * Deg2Rad);
+		}
+	}
+
+	CGFVector& CGFActor::GetOrigin()
+	{ 
+		return m_origin; 
+	}
+
+	void CGFActor::SetRotation(float Rotation)
+	{
+		m_rotation = Rotation;
+
+		if (GetPhysicsBody())
+		{
+			GetPhysicsBody()->SetTransform(m_position.ToB2Vec(), m_rotation * Deg2Rad);
+		}
+	}
+
+	float CGFActor::GetRotation()
+	{ 
+		return m_rotation; 
+	}
+
 	void CGFActor::SetVisibility(bool bVisibility)
 	{
 		bIsVisible = bVisibility;
@@ -40,11 +86,11 @@ namespace CGF
 		auto mapIt = Colors.begin();
 		for (mapIt; mapIt != Colors.end(); mapIt++)
 		{
-			AddColorForKey(mapIt->first, color);
+			SetColorForKey(mapIt->first, color);
 		}
 	}
 
-	void CGFActor::AddColorForKey(char key, COLORREF Color)
+	void CGFActor::SetColorForKey(char key, COLORREF Color)
 	{
 		Colors[key] = Color;
 	}
@@ -52,6 +98,72 @@ namespace CGF
 	COLORREF CGFActor::GetColorForKey(char key)
 	{
 		return Colors[key];
+	}
+
+	void CGFActor::SetCollisionForKey(char key, bool isEnabled)
+	{
+		Collidables[key] = isEnabled;
+	}
+
+	bool CGFActor::GetCollisionForKey(char key)
+	{
+		return Collidables[key];
+	}
+
+	b2Body* CGFActor::GetPhysicsBody()
+	{
+		return PhysicsBody;
+	}
+
+	void CGFActor::CreateCollisionShape(PhysicsType type)
+	{
+		BodyDef.type = (b2BodyType)type;
+		BodyDef.position = b2Vec2(m_position.X, m_position.Y);
+		BodyDef.angle = m_rotation * Deg2Rad;
+
+		auto pWorld = CGFEngine::Instance()->GetPhysicsWorld();
+
+		PhysicsBody = pWorld->CreateBody(&BodyDef);
+
+		float Size = PIXEL_TO_METRE * 50;
+
+		for (unsigned int i = 0; i < m_Image.ImageArray.size(); i++)
+		{
+			auto Column = m_Image.ImageArray[i];
+			for (unsigned int j = 0; j < Column.size(); j++)
+			{
+				bool IsCollidable = GetCollisionForKey(Column[j]);
+				if (IsCollidable)
+				{
+					b2PolygonShape boxShape;
+					b2Vec2 Vertices[4];
+					Vertices[0].Set(j * Size, i * Size);
+					Vertices[1].Set(Size + j * Size, i * Size);
+					Vertices[2].Set(Size + j * Size, Size + i * Size);
+					Vertices[3].Set(j * Size, Size + i * Size);
+
+					boxShape.Set(Vertices, 4);
+
+					b2FixtureDef boxFixtureDef;
+					boxFixtureDef.shape = &boxShape;
+					boxFixtureDef.density = 10;
+					boxFixtureDef.friction = 0.3;
+					PhysicsBody->CreateFixture(&boxFixtureDef);
+				}
+			}
+		}
+	}
+
+	void CGFActor::PhysicsUpdate()
+	{
+		if (!PhysicsBody || PhysicsBody && PhysicsBody->GetType() == b2_staticBody)
+			return;
+
+		auto postion = PhysicsBody->GetPosition();
+		auto rotation = PhysicsBody->GetAngle();
+
+		m_position = CGFVector(postion.x, postion.y);
+		m_rotation = rotation * Rad2Deg;
 	}
 
 	void CGFActor::SetParent(CGFActor* Parent)

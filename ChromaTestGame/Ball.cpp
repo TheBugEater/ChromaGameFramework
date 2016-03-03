@@ -10,7 +10,10 @@ Ball::Ball()
 
 	SetImage(BallImage());
 
-	AddColorForKey('O', (COLORREF)CGFColors::Red);
+	SetColorForKey('O', (COLORREF)CGFColors::Red);
+	SetCollisionForKey('O', true);
+
+	CreateCollisionShape(PhysicsType::DynamicBody);
 }
 
 
@@ -38,26 +41,9 @@ void Ball::Update(float delta)
 			bIsJumping = true;
 			JumpVelocity = 20;
 		}
-	}
 
-	if (bIsJumping)
-	{
-		Position.Y -= delta * JumpVelocity;
-		JumpVelocity -= delta * 2;
-		if (JumpVelocity <= 0 || Position.Y < 0)
-		{
-			bIsJumping = false;
-			JumpVelocity = 0;
-		}
+		//GetPhysicsBody()->ApplyForce(b2Vec2(0, -10), GetPosition().ToB2Vec(), true);
 	}
-
-	Position.Y += delta * 10;
-	if (Position.Y > 5)
-	{
-		Position.Y = 5;
-	}
-
-	SetPosition(Position);
 
 	//float Rotation = GetRotation();
 	//Rotation += delta * 360;

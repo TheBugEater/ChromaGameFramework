@@ -22,6 +22,10 @@ typedef RZRESULT(*SETEFFECT)(RZEFFECTID EffectId);
 
 namespace CGF
 {
+
+	static const float METRE_TO_PIXEL = 50;
+	static const float PIXEL_TO_METRE = 0.02f;
+
 	// Singleton Class to Handle All the Game Functionalities
 	class CGF_DLL CGFEngine
 	{
@@ -41,6 +45,9 @@ namespace CGF
 
 		/** Sets the Clear Color */
 		void SetClearColor(CGFColors Color);
+
+		/** Creates a Physics World */
+		void CreatePhysicsWorld(CGFVector Gravity);
 
 		/** Note : Blocking Function, Starts Game Loop */
 		void Run();
@@ -69,6 +76,8 @@ namespace CGF
 
 		std::vector<class CGFActor*> m_actorList;
 
+		b2World* GetPhysicsWorld();
+
 		// Chroma Handlers
 	private:
 		void Clear();
@@ -83,5 +92,9 @@ namespace CGF
 		INIT Init;
 
 		ChromaSDK::Keyboard::CUSTOM_EFFECT_TYPE Canvas = {};
+
+		// Box2D
+
+		b2World* PhysicsWorld;
 	};
 }

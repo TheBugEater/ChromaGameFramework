@@ -4,6 +4,13 @@
 
 namespace CGF
 {
+	enum class PhysicsType
+	{
+		StaticBody = 0,
+		KinematicBody,
+		DynamicBody
+	};
+
 	struct CGF_DLL CGFImage
 	{
 	public:
@@ -29,20 +36,25 @@ namespace CGF
 		void SetColor(COLORREF color);
 		COLORREF GetColor() { return Color; }
 
-		void SetPosition(CGFVector& Position) { m_position = Position; }
-		CGFVector& GetPosition() { return m_position; }
+		void SetPosition(CGFVector& Position);
+		CGFVector& GetPosition();
 
-		void SetOrigin(CGFVector& Origin) { m_origin = Origin; }
-		CGFVector& GetOrigin() { return m_origin; }
+		void SetOrigin(CGFVector& Origin);
+		CGFVector& GetOrigin();
 
-		void SetRotation(float Rotation) { m_rotation = Rotation; }
-		float GetRotation() { return m_rotation; }
+		void SetRotation(float Rotation);
+		float GetRotation();
 
 		void SetImage(CGFImage& Image) { m_Image = Image; }
 		CGFImage& GetImage() { return m_Image; }
 
-		void AddColorForKey(char key, COLORREF Color);
+		void SetColorForKey(char key, COLORREF Color);
 		COLORREF GetColorForKey(char key);
+
+		void SetCollisionForKey(char key, bool isEnabled);
+		bool GetCollisionForKey(char key);
+
+		void CreateCollisionShape(PhysicsType type);
 
 		void SetParent(CGFActor* Parent);
 
@@ -54,7 +66,10 @@ namespace CGF
 
 		virtual void Update(float DeltaTime);
 
+		b2Body* GetPhysicsBody();
+
 	private:
+		virtual void PhysicsUpdate();
 		void Draw();
 
 		CGFActor* m_pParent;
@@ -71,5 +86,11 @@ namespace CGF
 		CGFImage m_Image;
 
 		std::map<char, COLORREF> Colors;
+		std::map<char, bool> Collidables;
+
+		// Box2D Implementation
+		b2Shape* BodyShape;
+		b2BodyDef BodyDef;
+		b2Body* PhysicsBody;
 	};
 }
