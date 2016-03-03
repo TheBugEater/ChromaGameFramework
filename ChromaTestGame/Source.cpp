@@ -11,8 +11,8 @@ struct TestActorImage : public CGFImage
 	{
 		ImageArray = 
 		{
-			{ 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'X', 'X', 'X', 'X', 'X', 'O', 'O' },
-			{ 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'O', 'O', 'O', 'O', 'X', 'X', 'X' },
+			{ 'O', 'X', 'X', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O' },
+			{ 'X', 'X', 'X', 'X', 'O', 'O', 'O', 'O', 'O', 'O', 'X', 'X', 'X', 'X', 'X', 'O', 'O', 'O', 'O', 'X', 'X', 'X' },
 			{ 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X' }
 		};
 	}
@@ -33,7 +33,7 @@ public:
 
 		SetCollisionForKey('X', true);
 
-		CreateCollisionShape(PhysicsType::StaticBody);
+		CreateCollisionShape(EPhysicsShape::Polygon, EPhysicsType::StaticBody);
 	}
 
 	virtual void Update(float delta)
@@ -53,21 +53,12 @@ public:
 
 	Game()
 	{
-		pActor = new Ball();
-		pTest = new TestActor();
+		pActor = CGFActor::Create<Ball>();
+		pTest = CGFActor::Create<TestActor>();
 	}
 
 	~Game()
 	{
-		if (pActor)
-		{
-			delete pActor;
-		}
-
-		if (pTest)
-		{
-			delete pTest;
-		}
 	}
 
 	virtual void Start()

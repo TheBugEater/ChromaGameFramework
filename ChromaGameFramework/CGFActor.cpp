@@ -9,6 +9,7 @@ namespace CGF
 		, m_pParent(nullptr)
 		, BodyShape(nullptr)
 		, PhysicsBody(nullptr)
+		, bIsPendingDestroy(false)
 	{
 		CGFEngine::Instance()->AddActor(this);
 	}
@@ -26,7 +27,7 @@ namespace CGF
 
 	void CGFActor::DestroyActor()
 	{
-
+		bIsPendingDestroy = true;
 	}
 
 	void CGFActor::SetPosition(CGFVector& Position)
@@ -115,7 +116,7 @@ namespace CGF
 		return PhysicsBody;
 	}
 
-	void CGFActor::CreateCollisionShape(PhysicsType type)
+	void CGFActor::CreateCollisionShape(EPhysicsShape shape, EPhysicsType type, float density, float friction, float restitution)
 	{
 		BodyDef.type = (b2BodyType)type;
 		BodyDef.position = b2Vec2(m_position.X, m_position.Y);
@@ -127,30 +128,51 @@ namespace CGF
 
 		float Size = PIXEL_TO_METRE * 50;
 
-		for (unsigned int i = 0; i < m_Image.ImageArray.size(); i++)
+		if (shape == EPhysicsShape::Polygon)
 		{
-			auto Column = m_Image.ImageArray[i];
-			for (unsigned int j = 0; j < Column.size(); j++)
+			for (unsigned int i = 0; i < m_Image.ImageArray.size(); i++)
 			{
-				bool IsCollidable = GetCollisionForKey(Column[j]);
-				if (IsCollidable)
+				auto Column = m_Image.ImageArray[i];
+				for (unsigned int j = 0; j < Column.size(); j++)
 				{
-					b2PolygonShape boxShape;
-					b2Vec2 Vertices[4];
-					Vertices[0].Set(j * Size, i * Size);
-					Vertices[1].Set(Size + j * Size, i * Size);
-					Vertices[2].Set(Size + j * Size, Size + i * Size);
-					Vertices[3].Set(j * Size, Size + i * Size);
+					bool IsCollidable = GetCollisionForKey(Column[j]);
+					if (IsCollidable)
+					{
+						b2PolygonShape boxShape;
+						b2Vec2 Vertices[4];
+						Vertices[0].Set(j * Size, i * Size);
+						Vertices[1].Set(Size + j * Size, i * Size);
+						Vertices[2].Set(Size + j * Size, Size + i * Size);
+						Vertices[3].Set(j * Size, Size + i * Size);
 
-					boxShape.Set(Vertices, 4);
+						boxShape.Set(Vertices, 4);
 
-					b2FixtureDef boxFixtureDef;
-					boxFixtureDef.shape = &boxShape;
-					boxFixtureDef.density = 10;
-					boxFixtureDef.friction = 0.3;
-					PhysicsBody->CreateFixture(&boxFixtureDef);
+						b2FixtureDef boxFixtureDef;
+						boxFixtureDef.shape = &boxShape;
+						boxFixtureDef.density = density;
+						boxFixtureDef.friction = friction;
+						boxFixtureDef.restitution = restitution;
+						PhysicsBody->CreateFixture(&boxFixtureDef);
+					}
 				}
 			}
+		}
+		else if (shape == EPhysicsShape::Circle)
+		{
+			unsigned int Width = m_Image.ImageArray[0].size() * Size;
+
+			b2CircleShape circularShape;
+			circularShape.m_radius = (float)Width/2;
+			circularShape.m_p = b2Vec2((float)Width / 2, (float)Width / 2);
+
+			b2FixtureDef circleFixtureDef;
+			circleFixtureDef.shape = &circularShape;
+			circleFixtureDef.density = density;
+			circleFixtureDef.friction = friction;
+			circleFixtureDef.restitution = restitution;
+
+			PhysicsBody->CreateFixture(&circleFixtureDef);
+
 		}
 	}
 

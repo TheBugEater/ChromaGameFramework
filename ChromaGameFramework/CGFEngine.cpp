@@ -98,8 +98,14 @@ namespace CGF
 					DrawAll();
 					DrawTime = 0;
 				}
+
+				// Clean Destroyed Actors
+				Clean();
 			}
 		}
+
+		// Clean All Actors
+		Clean(true);
 
 		Clear();
 		Flush();
@@ -111,7 +117,7 @@ namespace CGF
 		for (actorIt; actorIt != m_actorList.end(); actorIt++)
 		{
 			CGFActor* pActor = *actorIt;
-			if (pActor)
+			if (pActor && !pActor->bIsPendingDestroy)
 			{
 				pActor->Update(Delta);
 			}
@@ -119,7 +125,7 @@ namespace CGF
 
 		if (PhysicsWorld)
 		{
-			float32 timeStep = Delta;
+			float32 timeStep = Delta * 2;
 			static const int32 velocityIterations = 8;
 			static const int32 positionIterations = 4;
 
@@ -129,7 +135,7 @@ namespace CGF
 			for (actorIt; actorIt != m_actorList.end(); actorIt++)
 			{
 				CGFActor* pActor = *actorIt;
-				if (pActor)
+				if (pActor && !pActor->bIsPendingDestroy)
 				{
 					pActor->PhysicsUpdate();
 				}
@@ -146,7 +152,7 @@ namespace CGF
 		for (actorIt; actorIt != m_actorList.end(); actorIt++)
 		{
 			CGFActor* pActor = *actorIt;
-			if (pActor && pActor->IsVisible())
+			if (pActor && pActor->IsVisible() && !pActor->bIsPendingDestroy)
 			{
 				// Draw here
 				DrawActor(pActor);
@@ -156,6 +162,22 @@ namespace CGF
 		if (!CompareCanvases(LastCanvas, Canvas))
 		{
 			Flush();
+		}
+	}
+
+	void CGFEngine::Clean(bool bForceAll)
+	{
+		auto actorIt = m_actorList.begin();
+		for (actorIt; actorIt != m_actorList.end(); actorIt++)
+		{
+			CGFActor* pActor = *actorIt;
+			if (pActor && pActor->bIsPendingDestroy || bForceAll)
+			{
+				actorIt = m_actorList.erase(actorIt);
+				
+				delete pActor;
+				pActor = nullptr;
+			}
 		}
 	}
 
@@ -222,22 +244,22 @@ namespace CGF
 			auto Column = pActor->m_Image.ImageArray[i];
 			for (unsigned int j = 0; j < Column.size(); j++)
 			{
-				CGFVector Pos = IntVector - Origin;
-				CGFVector NewPos = Pos;
-				NewPos.X += j;
-				NewPos.Y += i;
-				NewPos = Rotate(NewPos, Pos + Origin, Rotation);
+				COLORREF Color = pActor->GetColorForKey(Column[j]);
+				if (Color != 0)
+				{
+					CGFVector Pos = IntVector - Origin;
+					CGFVector NewPos = Pos;
+					NewPos.X += j;
+					NewPos.Y += i;
+					NewPos = Rotate(NewPos, Pos + Origin, Rotation);
 
-				int X = Clamp<int>((int)round(NewPos.X), 0, 21);
-				int Y = Clamp<int>((int)round(NewPos.Y), 0, 5);
+					int X = Clamp<int>((int)round(NewPos.X), 0, 21);
+					int Y = Clamp<int>((int)round(NewPos.Y), 0, 5);
 
-				Canvas.Color[Y][X] = pActor->GetColorForKey(Column[j]);
+					Canvas.Color[Y][X] = pActor->GetColorForKey(Column[j]);
+				}
 			}
 		}
-
-		//int X = Clamp<int>((int)Position.X, 0, 21);
-		//int Y = Clamp<int>((int)Position.Y, 0, 5);
-		//Canvas.Color[Y][X] = pActor->GetColor();
 	}
 
 	void CGFEngine::Flush()

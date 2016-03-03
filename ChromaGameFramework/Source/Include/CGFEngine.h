@@ -65,6 +65,7 @@ namespace CGF
 
 		void UpdateAll(float Delta);
 		void DrawAll();
+		void Clean(bool bForceAll = false);
 		void PrintStdOut();
 
 		static CGFEngine* _pInstance;

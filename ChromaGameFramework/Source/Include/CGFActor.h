@@ -4,11 +4,17 @@
 
 namespace CGF
 {
-	enum class PhysicsType
+	enum class EPhysicsType
 	{
 		StaticBody = 0,
 		KinematicBody,
 		DynamicBody
+	};
+
+	enum class EPhysicsShape
+	{
+		Circle = 0,
+		Polygon		
 	};
 
 	struct CGF_DLL CGFImage
@@ -24,11 +30,20 @@ namespace CGF
 
 	class CGF_DLL CGFActor
 	{
-	public:
+	protected:
 		CGFActor();
+
+	public:
 		virtual ~CGFActor();
 
 		virtual void DestroyActor();
+
+		template<typename t>
+		static t* Create()
+		{
+			t* pActor = new t;
+			return pActor;
+		}
 
 		virtual void SetVisibility(bool bVisibility);
 		virtual bool IsVisible() { return bIsVisible; }
@@ -54,7 +69,7 @@ namespace CGF
 		void SetCollisionForKey(char key, bool isEnabled);
 		bool GetCollisionForKey(char key);
 
-		void CreateCollisionShape(PhysicsType type);
+		void CreateCollisionShape(EPhysicsShape shape, EPhysicsType type, float density = 1, float friction = 0, float restitution = 0);
 
 		void SetParent(CGFActor* Parent);
 
@@ -81,6 +96,7 @@ namespace CGF
 		float m_rotation;
 		
 		bool bIsVisible;
+		bool bIsPendingDestroy;
 
 		COLORREF Color;
 		CGFImage m_Image;
