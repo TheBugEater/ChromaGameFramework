@@ -1,0 +1,87 @@
+#pragma once
+#include "CGFTypes.h"
+
+#include "RzChromaSDKDefines.h"
+#include "RzChromaSDKTypes.h"
+#include "RzErrors.h"
+
+#include <vector>
+
+#ifdef _WIN64
+#define CHROMASDKDLL        _T("RzChromaSDK64.dll")
+#else
+#define CHROMASDKDLL        _T("RzChromaSDK.dll")
+#endif
+
+using namespace ChromaSDK;
+using namespace ChromaSDK::Keyboard;
+
+typedef RZRESULT(*INIT)(void);
+typedef RZRESULT(*CREATEKEYBOARDEFFECT)(ChromaSDK::Keyboard::EFFECT_TYPE Effect, PRZPARAM pParam, RZEFFECTID *pEffectId);
+typedef RZRESULT(*SETEFFECT)(RZEFFECTID EffectId);
+
+namespace CGF
+{
+	// Singleton Class to Handle All the Game Functionalities
+	class CGF_DLL CGFEngine
+	{
+	private:
+		CGFEngine();
+		~CGFEngine();
+
+	public:
+		/** Returns an Instance of the Engine */
+		static CGFEngine* Instance();
+
+		/** Destroys the Instance of the Engine */
+		static void DestroyInstance();
+
+		/** Sets the Default Game Class */
+		void SetGameClass(class CGFGame* pGame);
+
+		/** Sets the Clear Color */
+		void SetClearColor(CGFColors Color);
+
+		/** Note : Blocking Function, Starts Game Loop */
+		void Run();
+
+		/** Exits the Game */
+		void Exit();
+
+		/** Returns Canvas Size */
+		CGFSize GetCanvasSize();
+
+	private:
+		friend class CGFActor;
+		void AddActor(class CGFActor* pActor);
+		bool RemoveActor(class CGFActor* pActor);
+
+		void UpdateAll(float Delta);
+		void DrawAll();
+		void PrintStdOut();
+
+		static CGFEngine* _pInstance;
+
+		class CGFGame* m_pGame;
+
+		bool m_bExit;
+		CGFColors ClearColor;
+
+		std::vector<class CGFActor*> m_actorList;
+
+		// Chroma Handlers
+	private:
+		void Clear();
+		void DrawActor(class CGFActor* Actor);
+		void Flush();
+		bool CompareCanvases(ChromaSDK::Keyboard::CUSTOM_EFFECT_TYPE Canvas1, ChromaSDK::Keyboard::CUSTOM_EFFECT_TYPE Canvas2);
+
+		HMODULE m_ChromaSDKModule;
+
+		CREATEKEYBOARDEFFECT CreateKeyboardEffect;
+		SETEFFECT SetEffect;
+		INIT Init;
+
+		ChromaSDK::Keyboard::CUSTOM_EFFECT_TYPE Canvas = {};
+	};
+}
