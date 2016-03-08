@@ -23,6 +23,9 @@ public:
 	virtual void Update(float delta);
 	float ColorChange;
 
+	virtual void OnCollisionEnter(CGFActor* OtherActor);
+	virtual void OnCollisionExit(CGFActor* OtherActor);
+
 private:
 
 	bool bIsJumping;

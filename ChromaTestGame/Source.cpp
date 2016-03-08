@@ -2,31 +2,35 @@
 #include "CGFGame.h"
 #include "CGFActor.h"
 #include "Ball.h"
+#include "vld.h"
 
 using namespace CGF;
 
-struct TestActorImage : public CGFImage
+struct BGImage : public CGFImage
 {
-	TestActorImage()
+	BGImage()
 	{
-		ImageArray = 
+		ImageArray =
 		{
-			{ 'O', 'X', 'X', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O' },
-			{ 'X', 'X', 'X', 'X', 'O', 'O', 'O', 'O', 'O', 'O', 'X', 'X', 'X', 'X', 'X', 'O', 'O', 'O', 'O', 'X', 'X', 'X' },
+			{ 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X' },
+			{ 'X', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'X' },
+			{ 'X', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'X' },
+			{ 'X', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'X' },
+			{ 'X', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'X' },
 			{ 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X' }
 		};
 	}
 };
 
-class TestActor : public CGFActor
+class BGActor : public CGFActor
 {
 public:
 
-	TestActor()
+	BGActor()
 	{
-		SetImage(TestActorImage());
+		SetImage(BGImage());
 
-		SetPosition(CGFVector(0, 3));
+		SetPosition(CGFVector(0, 0));
 		SetOrigin(CGFVector(0, 0));
 
 		SetColorForKey('X', (COLORREF)CGFColors::Blue);
@@ -38,9 +42,6 @@ public:
 
 	virtual void Update(float delta)
 	{
-		/*float Rotation = GetRotation();
-		Rotation += delta * 180;
-		SetRotation(Rotation);*/
 	}
 };
 
@@ -48,21 +49,10 @@ class Game : public CGFGame
 {
 public:
 
-	Ball* pActor;
-	TestActor* pTest;
-
-	Game()
-	{
-		pActor = CGFActor::Create<Ball>();
-		pTest = CGFActor::Create<TestActor>();
-	}
-
-	~Game()
-	{
-	}
-
 	virtual void Start()
 	{
+		CGFEngine::Create<BGActor>();
+		CGFEngine::Create<Ball>();
 	}
 
 	virtual void Update(float delta)

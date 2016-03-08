@@ -26,6 +26,13 @@ namespace CGF
 	static const float METRE_TO_PIXEL = 50;
 	static const float PIXEL_TO_METRE = 0.02f;
 
+	class CGFContactListener : public b2ContactListener
+	{
+		void BeginContact(b2Contact* contact);
+
+		void EndContact(b2Contact* contact);
+	};
+
 	// Singleton Class to Handle All the Game Functionalities
 	class CGF_DLL CGFEngine
 	{
@@ -39,6 +46,13 @@ namespace CGF
 
 		/** Destroys the Instance of the Engine */
 		static void DestroyInstance();
+
+		template<class t>
+		static t* Create()
+		{
+			t* pActor = new t;
+			return pActor;
+		}
 
 		/** Sets the Default Game Class */
 		void SetGameClass(class CGFGame* pGame);
@@ -97,5 +111,6 @@ namespace CGF
 		// Box2D
 
 		b2World* PhysicsWorld;
+		CGFContactListener m_contactListener;
 	};
 }

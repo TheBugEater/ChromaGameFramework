@@ -6,7 +6,7 @@ namespace CGF
 		: bIsVisible(true)
 		, Color((COLORREF)CGFColors::White)
 		, m_rotation(0)
-		, m_pParent(nullptr)
+		// , m_pParent(nullptr)
 		, BodyShape(nullptr)
 		, PhysicsBody(nullptr)
 		, bIsPendingDestroy(false)
@@ -18,6 +18,12 @@ namespace CGF
 	CGFActor::~CGFActor()
 	{
 		CGFEngine::Instance()->RemoveActor(this);
+
+		if (PhysicsBody)
+		{
+			CGFEngine::Instance()->GetPhysicsWorld()->DestroyBody(PhysicsBody);
+			PhysicsBody = nullptr;
+		}
 	}
 
 	void CGFActor::Update(float DeltaTime)
@@ -36,7 +42,7 @@ namespace CGF
 
 		if (GetPhysicsBody())
 		{
-			GetPhysicsBody()->SetTransform(m_position.ToB2Vec(), m_rotation * Deg2Rad);
+			GetPhysicsBody()->SetTransform(m_position.ToB2Vec(), m_rotation * (float)Deg2Rad);
 		}
 	}
 
@@ -51,7 +57,7 @@ namespace CGF
 
 		if (GetPhysicsBody())
 		{
-			GetPhysicsBody()->SetTransform(m_position.ToB2Vec(), m_rotation * Deg2Rad);
+			GetPhysicsBody()->SetTransform(m_position.ToB2Vec(), m_rotation * (float)Deg2Rad);
 		}
 	}
 
@@ -66,7 +72,7 @@ namespace CGF
 
 		if (GetPhysicsBody())
 		{
-			GetPhysicsBody()->SetTransform(m_position.ToB2Vec(), m_rotation * Deg2Rad);
+			GetPhysicsBody()->SetTransform(m_position.ToB2Vec(), m_rotation * (float)Deg2Rad);
 		}
 	}
 
@@ -120,9 +126,11 @@ namespace CGF
 	{
 		BodyDef.type = (b2BodyType)type;
 		BodyDef.position = b2Vec2(m_position.X, m_position.Y);
-		BodyDef.angle = m_rotation * Deg2Rad;
+		BodyDef.angle = m_rotation * (float)Deg2Rad;
 
-		auto pWorld = CGFEngine::Instance()->GetPhysicsWorld();
+		b2World* const pWorld = CGFEngine::Instance()->GetPhysicsWorld();
+		if (!pWorld)
+			return;
 
 		PhysicsBody = pWorld->CreateBody(&BodyDef);
 
@@ -159,7 +167,7 @@ namespace CGF
 		}
 		else if (shape == EPhysicsShape::Circle)
 		{
-			unsigned int Width = m_Image.ImageArray[0].size() * Size;
+			float Width = m_Image.ImageArray[0].size() * Size;
 
 			b2CircleShape circularShape;
 			circularShape.m_radius = (float)Width/2;
@@ -174,6 +182,8 @@ namespace CGF
 			PhysicsBody->CreateFixture(&circleFixtureDef);
 
 		}
+
+		PhysicsBody->SetUserData(this);
 	}
 
 	void CGFActor::PhysicsUpdate()
@@ -185,23 +195,33 @@ namespace CGF
 		auto rotation = PhysicsBody->GetAngle();
 
 		m_position = CGFVector(postion.x, postion.y);
-		m_rotation = rotation * Rad2Deg;
+		m_rotation = rotation * (float)Rad2Deg;
 	}
 
-	void CGFActor::SetParent(CGFActor* Parent)
+	void CGFActor::OnCollisionEnter(CGFActor* OtherActor)
 	{
-		m_pParent = Parent;
+
 	}
 
-	void CGFActor::AddChild(CGFActor* Child)
+	void CGFActor::OnCollisionExit(CGFActor* OtherActor)
 	{
-		m_children.push_back(Child);
+
 	}
 
-	bool CGFActor::RemoveChild(CGFActor* Child)
-	{
-		return true;
-	}
+	//void CGFActor::SetParent(CGFActor* Parent)
+	//{
+	//	m_pParent = Parent;
+	//}
+
+	//void CGFActor::AddChild(CGFActor* Child)
+	//{
+	//	m_children.push_back(Child);
+	//}
+
+	//bool CGFActor::RemoveChild(CGFActor* Child)
+	//{
+	//	return true;
+	//}
 
 	void CGFActor::Draw()
 	{

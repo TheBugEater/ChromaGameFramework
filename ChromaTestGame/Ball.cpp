@@ -6,14 +6,14 @@ Ball::Ball()
 	, bIsJumping(false)
 	, JumpVelocity(0)
 {
-	SetPosition(CGFVector(16, 0));
+	SetPosition(CGFVector(16, 1));
 
 	SetImage(BallImage());
 
-	SetColorForKey('O', (COLORREF)CGFColors::Red);
+	SetColorForKey('O', (COLORREF)CGFColors::Green);
 	SetCollisionForKey('O', true);
 
-	CreateCollisionShape(EPhysicsShape::Circle, EPhysicsType::DynamicBody, 1, 0.1f, 0.5f);
+	CreateCollisionShape(EPhysicsShape::Circle, EPhysicsType::DynamicBody, 1, .5f, 0.8f);
 }
 
 
@@ -47,6 +47,12 @@ void Ball::Update(float delta)
 		Y = -1;
 	}
 
+	if (GetAsyncKeyState(VK_ESCAPE) & 0x8000)
+	{
+		CGFEngine::Instance()->Exit();
+	}
+
+
 	if (X || Y)
 	{
 		GetPhysicsBody()->ApplyForceToCenter(b2Vec2(X, Y), true);
@@ -59,4 +65,14 @@ void Ball::Update(float delta)
 	/*ColorChange += delta;
 	SetColor(ColorBlend((COLORREF)CGFColors::Red, (COLORREF)CGFColors::Blue, ColorChange));*/
 
+}
+
+void Ball::OnCollisionEnter(CGFActor* OtherActor)
+{
+	SetColor((COLORREF)CGFColors::Red);
+}
+
+void Ball::OnCollisionExit(CGFActor* OtherActor)
+{
+	SetColor((COLORREF)CGFColors::Green);
 }

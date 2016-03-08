@@ -7,6 +7,40 @@
 
 namespace CGF
 {
+	void CGFContactListener::BeginContact(b2Contact* contact)
+	{
+		void* bodyUserDataA = contact->GetFixtureA()->GetBody()->GetUserData();
+
+		void* bodyUserDataB = contact->GetFixtureB()->GetBody()->GetUserData();
+
+		auto ActorA = static_cast <CGFActor*>(bodyUserDataA);
+		auto ActorB = static_cast <CGFActor*>(bodyUserDataB);
+
+		if (ActorA && ActorB)
+		{
+			ActorA->OnCollisionEnter(ActorB);
+			ActorB->OnCollisionEnter(ActorA);
+		}
+	}
+
+	void CGFContactListener::EndContact(b2Contact* contact)
+	{
+		void* bodyUserDataA = contact->GetFixtureA()->GetBody()->GetUserData();
+
+		void* bodyUserDataB = contact->GetFixtureB()->GetBody()->GetUserData();
+
+		auto ActorA = static_cast <CGFActor*>(bodyUserDataA);
+		auto ActorB = static_cast <CGFActor*>(bodyUserDataB);
+
+		if (ActorA && ActorB)
+		{
+			ActorA->OnCollisionExit(ActorB);
+			ActorB->OnCollisionExit(ActorA);
+		}
+
+	}
+		
+
 	CGFEngine* CGFEngine::_pInstance = nullptr;
 
 	CGFEngine::CGFEngine()
@@ -56,6 +90,7 @@ namespace CGF
 	void CGFEngine::CreatePhysicsWorld(CGFVector Gravity)
 	{
 		PhysicsWorld = new b2World(b2Vec2(Gravity.X, Gravity.Y));
+		PhysicsWorld->SetContactListener(&m_contactListener);
 	}
 
 	b2World* CGFEngine::GetPhysicsWorld()
@@ -168,7 +203,7 @@ namespace CGF
 	void CGFEngine::Clean(bool bForceAll)
 	{
 		auto actorIt = m_actorList.begin();
-		for (actorIt; actorIt != m_actorList.end(); actorIt++)
+		while (!m_actorList.empty() && actorIt != m_actorList.end())
 		{
 			CGFActor* pActor = *actorIt;
 			if (pActor && pActor->bIsPendingDestroy || bForceAll)
@@ -177,6 +212,10 @@ namespace CGF
 				
 				delete pActor;
 				pActor = nullptr;
+			}
+			else
+			{
+				++actorIt;
 			}
 		}
 	}
@@ -198,9 +237,7 @@ namespace CGF
 
 	bool CGFEngine::RemoveActor(CGFActor* pActor)
 	{
-		// m_actorList.erase(pActor);
-		auto position = std::find(m_actorList.begin(), m_actorList.end(), pActor);
-		m_actorList.erase(position);
+		m_actorList.erase(std::remove(m_actorList.begin(), m_actorList.end(), pActor), m_actorList.end());
 		return true;
 	}
 

@@ -18,6 +18,7 @@
 
 namespace CGF
 {
+
 	static const double Deg2Rad = M_PI / 180;
 	static const double Rad2Deg = 180 / M_PI;
 

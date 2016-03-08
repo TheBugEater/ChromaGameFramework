@@ -1,3 +1,6 @@
+#ifndef CGFACTOR_H
+#define CGFACTOR_H
+
 #pragma once
 #include "CGFEngine.h"
 #include <map>
@@ -38,13 +41,6 @@ namespace CGF
 
 		virtual void DestroyActor();
 
-		template<typename t>
-		static t* Create()
-		{
-			t* pActor = new t;
-			return pActor;
-		}
-
 		virtual void SetVisibility(bool bVisibility);
 		virtual bool IsVisible() { return bIsVisible; }
 
@@ -71,10 +67,12 @@ namespace CGF
 
 		void CreateCollisionShape(EPhysicsShape shape, EPhysicsType type, float density = 1, float friction = 0, float restitution = 0);
 
-		void SetParent(CGFActor* Parent);
+		virtual void OnCollisionEnter(CGFActor* OtherActor);
+		virtual void OnCollisionExit(CGFActor* OtherActor);
+		// void SetParent(CGFActor* Parent);
 
-		void AddChild(CGFActor* Child);
-		bool RemoveChild(CGFActor* Child);
+		// void AddChild(CGFActor* Child);
+		// bool RemoveChild(CGFActor* Child);
 
 	protected:
 		friend class CGFEngine;
@@ -87,11 +85,11 @@ namespace CGF
 		virtual void PhysicsUpdate();
 		void Draw();
 
-		CGFActor* m_pParent;
+		// CGFActor* m_pParent;
 		CGFVector m_position;
 		CGFVector m_origin;
 
-		std::vector<CGFActor*> m_children;
+		// std::vector<CGFActor*> m_children;
 
 		float m_rotation;
 		
@@ -110,3 +108,5 @@ namespace CGF
 		b2Body* PhysicsBody;
 	};
 }
+
+#endif //CGFACTOR_H
