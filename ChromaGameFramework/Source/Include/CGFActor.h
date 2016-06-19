@@ -69,10 +69,6 @@ namespace CGF
 
 		virtual void OnCollisionEnter(CGFActor* OtherActor);
 		virtual void OnCollisionExit(CGFActor* OtherActor);
-		// void SetParent(CGFActor* Parent);
-
-		// void AddChild(CGFActor* Child);
-		// bool RemoveChild(CGFActor* Child);
 
 	protected:
 		friend class CGFEngine;
@@ -85,11 +81,8 @@ namespace CGF
 		virtual void PhysicsUpdate();
 		void Draw();
 
-		// CGFActor* m_pParent;
 		CGFVector m_position;
 		CGFVector m_origin;
-
-		// std::vector<CGFActor*> m_children;
 
 		float m_rotation;
 		

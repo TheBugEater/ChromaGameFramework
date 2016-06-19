@@ -6,7 +6,6 @@ namespace CGF
 		: bIsVisible(true)
 		, Color((COLORREF)CGFColors::White)
 		, m_rotation(0)
-		// , m_pParent(nullptr)
 		, BodyShape(nullptr)
 		, PhysicsBody(nullptr)
 		, bIsPendingDestroy(false)
@@ -207,21 +206,6 @@ namespace CGF
 	{
 
 	}
-
-	//void CGFActor::SetParent(CGFActor* Parent)
-	//{
-	//	m_pParent = Parent;
-	//}
-
-	//void CGFActor::AddChild(CGFActor* Child)
-	//{
-	//	m_children.push_back(Child);
-	//}
-
-	//bool CGFActor::RemoveChild(CGFActor* Child)
-	//{
-	//	return true;
-	//}
 
 	void CGFActor::Draw()
 	{

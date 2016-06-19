@@ -48,7 +48,7 @@ namespace CGF
 		static void DestroyInstance();
 
 		template<class t>
-		static t* Create()
+		static t* Spawn()
 		{
 			t* pActor = new t;
 			return pActor;

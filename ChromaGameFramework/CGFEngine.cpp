@@ -290,8 +290,8 @@ namespace CGF
 					NewPos.Y += i;
 					NewPos = Rotate(NewPos, Pos + Origin, Rotation);
 
-					int X = Clamp<int>((int)round(NewPos.X), 0, 21);
-					int Y = Clamp<int>((int)round(NewPos.Y), 0, 5);
+					int X = Clamp<int>((int)round(NewPos.X), 0, ChromaSDK::Keyboard::MAX_COLUMN - 1);
+					int Y = Clamp<int>((int)round(NewPos.Y), 0, ChromaSDK::Keyboard::MAX_ROW - 1);
 
 					Canvas.Color[Y][X] = pActor->GetColorForKey(Column[j]);
 				}

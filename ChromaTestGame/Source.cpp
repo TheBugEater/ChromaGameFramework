@@ -2,59 +2,26 @@
 #include "CGFGame.h"
 #include "CGFActor.h"
 #include "Ball.h"
-#include "vld.h"
+#include "BGActor.h"
 
 using namespace CGF;
 
-struct BGImage : public CGFImage
-{
-	BGImage()
-	{
-		ImageArray =
-		{
-			{ 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X' },
-			{ 'X', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'X' },
-			{ 'X', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'X' },
-			{ 'X', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'X' },
-			{ 'X', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'X' },
-			{ 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X' }
-		};
-	}
-};
-
-class BGActor : public CGFActor
-{
-public:
-
-	BGActor()
-	{
-		SetImage(BGImage());
-
-		SetPosition(CGFVector(0, 0));
-		SetOrigin(CGFVector(0, 0));
-
-		SetColorForKey('X', (COLORREF)CGFColors::Blue);
-
-		SetCollisionForKey('X', true);
-
-		CreateCollisionShape(EPhysicsShape::Polygon, EPhysicsType::StaticBody);
-	}
-
-	virtual void Update(float delta)
-	{
-	}
-};
-
+/************************************************************************/
+/*  The Game Logic Class - Example : Spawn Actors and Game Logic		*/
+/************************************************************************/
 class Game : public CGFGame
 {
 public:
 
+	// Will be Called only once when the game starts
 	virtual void Start()
 	{
-		CGFEngine::Create<BGActor>();
-		CGFEngine::Create<Ball>();
+		// Spawns the BG Actor and Ball in the Level
+		CGFEngine::Spawn<BGActor>();
+		CGFEngine::Spawn<Ball>();
 	}
 
+	// Update will be called every tick
 	virtual void Update(float delta)
 	{
 	}
@@ -65,13 +32,12 @@ int main()
 	CGFEngine* Engine = CGFEngine::Instance();
 	Engine->CreatePhysicsWorld(CGFVector(0, 1));
 
-	Game* pGame = new Game;
-	if (Engine && pGame)
+	Game game;
+	if (Engine)
 	{
-		Engine->SetGameClass(pGame);
+		Engine->SetGameClass(&game);
 		Engine->SetClearColor(CGFColors::Black);
 		Engine->Run();
-		delete pGame;
 	}
 	CGFEngine::DestroyInstance();
 }

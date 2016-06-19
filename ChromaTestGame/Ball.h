@@ -3,6 +3,9 @@
 
 using namespace CGF;
 
+/************************************************************************/
+/*  Ball Image. Denotes just 1 key										*/
+/************************************************************************/
 struct BallImage : public CGFImage
 {
 	BallImage()
@@ -14,20 +17,18 @@ struct BallImage : public CGFImage
 	}
 };
 
+/************************************************************************/
+/*  The Ball Actor.														*/
+/************************************************************************/
 class Ball : public CGFActor
 {
 public:
 	Ball();
 	~Ball();
 
+	// Update gets called every tick
 	virtual void Update(float delta);
-	float ColorChange;
-
-	virtual void OnCollisionEnter(CGFActor* OtherActor);
-	virtual void OnCollisionExit(CGFActor* OtherActor);
 
 private:
-
-	bool bIsJumping;
-	float JumpVelocity;
+	float ColorChange;
 };
